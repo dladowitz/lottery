@@ -84,13 +84,25 @@ describe('Lottery Contract', () => {
   it('sends money to the winner and resets the players array', async () => {
     let players;
 
-    await lottery.methods.enter().send({ from: accounts[1], value:  web3.utils.toWei('1', 'ether') });
+    await lottery.methods.enter().send({ from: accounts[1], value:  web3.utils.toWei('2', 'ether') });
+    const initialBalance = await web3.eth.getBalance(accounts[0]);
+    // console.log(initialBalance)
+
     players = await lottery.methods.getPlayers().call({ from: accounts[0] });
     assert.equal(1, players.length);
 
     await lottery.methods.pickWinner().send({ from: accounts[0] })
+    const finalBalance = await web3.eth.getBalance(accounts[0]);
+    // console.log(finalBalance)
+
     players = await lottery.methods.getPlayers().call({ from: accounts[0] });
     assert.equal(0, players.length);
+
+    balanceDifferance = initialBalance - finalBalance;
+    // console.log(balanceDifferance)
+
+    // getBalance(accounts[0]) doesnt seem to be picking up ether sent in to the contract
+    // assert(web3.utils.toWei('1.8', 'ether') < balanceDifferance);
   })
 
 });
